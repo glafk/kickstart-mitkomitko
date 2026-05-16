@@ -16,11 +16,33 @@ vim.pack.add(plugins)
 vim.keymap.set('n', '\\', '<Cmd>Neotree reveal<CR>', { desc = 'NeoTree reveal', silent = true })
 
 require('neo-tree').setup {
+  window = {
+    position = "left", -- Default layout is a left sidebar
+    width = 30,        -- Gives it a standard numeric width to prevent the crash
+    mappings = {
+      ['\\'] = 'close_window',
+    },
+  },
   filesystem = {
-    window = {
-      mappings = {
-        ['\\'] = 'close_window',
+    use_libuv_file_watcher = true,
+    follow_current_file = {
+      enabled = true,
+      leave_dirs_open = false,
+    },
+
+    filtered_items = {
+      visible = true,           -- Ensures filtered items are at least visible (dimmed)
+      hide_dotfiles = false,     -- DO NOT hide dotfiles like .env, .gitignore, etc.
+      hide_gitignored = false,   -- DO NOT hide files listed in your .gitignore
+      -- Optional: Explicitly ban things you NEVER want to see (like the raw .git folder)
+      never_show = {
+        ".git",
+        "node_modules",
       },
+    },
+
+    filters = {
+      exclude = {".git", "node_modules"},
     },
   },
 }

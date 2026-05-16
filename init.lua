@@ -223,10 +223,10 @@ do
   --  Use CTRL+<hjkl> to switch between windows
   --
   --  See `:help wincmd` for a list of all window commands
-  vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-  vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-  vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-  vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+  vim.keymap.set('n', '<C-u>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+  vim.keymap.set('n', '<C-n>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+  vim.keymap.set('n', '<C-i>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+  vim.keymap.set('n', '<C-e>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -483,6 +483,10 @@ do
   -- NOTE: You can install multiple plugins at once
   vim.pack.add(telescope_plugins)
 
+
+
+  local actions = require 'telescope.actions'
+
   -- See `:help telescope` and `:help telescope.setup()`
   require('telescope').setup {
     -- You can put your default mappings / updates / etc. in here
@@ -494,6 +498,16 @@ do
     --   },
     -- },
     -- pickers = {}
+    defaults = {
+      mappings = {
+        i = {
+          ['<C-d>'] = actions.delete_buffer, -- Delete buffer in Insert mode
+        },
+        n = {
+          ['dd'] = actions.delete_buffer,    -- Delete buffer in Normal mode
+        },
+      },
+    },
     extensions = {
       ['ui-select'] = { require('telescope.themes').get_dropdown() },
     },
@@ -979,3 +993,17 @@ end
 --
 --
 --
+
+-- Add support for auto-reloading buffers when files are changed externally
+-- Automatically reload files if changed outside of Neovim
+vim.o.autoread = true
+
+-- Force Neovim to check if files changed whenever focus shifts
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  pattern = "*",
+  callback = function()
+    if vim.fn.mode() ~= 'c' then
+      vim.cmd('checktime')
+    end
+  end,
+})
