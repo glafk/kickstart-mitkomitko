@@ -7,11 +7,21 @@ lint.linters_by_ft = {
   markdown = { 'markdownlint-cli2' }, -- Make sure to install `markdownlint` via mason / npm
 }
 
+-- FIX 1: Safely append your config path without breaking nvim-lint's default stream handling
 lint.linters['markdownlint-cli2'].args = {
   '--config',
   vim.fn.expand '~/.config/nvim/utils/.markdownlint-cli2.jsonc',
-  '--',
+  '-',
 }
+
+-- FIX 2: Create the engine trigger to actively scan the file
+vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufEnter', 'InsertLeave' }, {
+  group = vim.api.nvim_create_augroup('linting', { clear = true }),
+  callback = function()
+    -- Only run linting if we are in an actual file buffer
+    if vim.opt_local.modifiable:get() then lint.try_lint() end
+  end,
+})
 
 -- To allow other plugins to add linters to require('lint').linters_by_ft,
 -- instead set linters_by_ft like this:

@@ -2,7 +2,7 @@
   "config": {
     "default": true,
     "MD013": {
-      "line_length": 50,
+      "line_length": 100,
       "tables": false
     }
   }
