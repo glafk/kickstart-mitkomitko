@@ -810,7 +810,7 @@ do
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
       python = { 'ruff' },
-      markdown = { 'prettier_wrapped', 'markdownlint_cli2' },
+      markdown = { 'prettier_wrapped' },
     },
     formatters = {
       prettier_wrapped = {
@@ -821,15 +821,6 @@ do
           '--print-width',
           '100',
           '--stdin-filepath',
-          '$FILENAME',
-        },
-      },
-      markdownlint_cli2 = {
-        command = 'markdownlint-cli2',
-        args = {
-          '--config',
-          vim.fn.expand '~/.config/nvim/utils/.markdownlint-cli2.jsonc',
-          '--',
           '$FILENAME',
         },
       },
