@@ -483,8 +483,6 @@ do
   -- NOTE: You can install multiple plugins at once
   vim.pack.add(telescope_plugins)
 
-
-
   local actions = require 'telescope.actions'
 
   -- See `:help telescope` and `:help telescope.setup()`
@@ -504,7 +502,7 @@ do
           ['<C-d>'] = actions.delete_buffer, -- Delete buffer in Insert mode
         },
         n = {
-          ['dd'] = actions.delete_buffer,    -- Delete buffer in Normal mode
+          ['dd'] = actions.delete_buffer, -- Delete buffer in Normal mode
         },
       },
     },
@@ -786,12 +784,13 @@ do
   -- [[ Formatting ]]
   vim.pack.add { gh 'stevearc/conform.nvim' }
   require('conform').setup {
-    notify_on_error = false,
+    notify_on_error = true,
     format_on_save = function(bufnr)
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
-        -- lua = true,
-        -- python = true,
+        lua = true,
+        python = true,
+        markdown = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         return { timeout_ms = 500 }
@@ -810,6 +809,30 @@ do
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      python = { 'ruff' },
+      markdown = { 'prettier_wrapped', 'markdownlint_cli2' },
+    },
+    formatters = {
+      prettier_wrapped = {
+        command = 'prettier',
+        args = {
+          '--prose-wrap',
+          'always',
+          '--print-width',
+          '100',
+          '--stdin-filepath',
+          '$FILENAME',
+        },
+      },
+      markdownlint_cli2 = {
+        command = 'markdownlint-cli2',
+        args = {
+          '--config',
+          vim.fn.expand '~/.config/nvim/utils/.markdownlint-cli2.jsonc',
+          '--',
+          '$FILENAME',
+        },
+      },
     },
   }
 
@@ -999,11 +1022,9 @@ end
 vim.o.autoread = true
 
 -- Force Neovim to check if files changed whenever focus shifts
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
-  pattern = "*",
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold' }, {
+  pattern = '*',
   callback = function()
-    if vim.fn.mode() ~= 'c' then
-      vim.cmd('checktime')
-    end
+    if vim.fn.mode() ~= 'c' then vim.cmd 'checktime' end
   end,
 })
